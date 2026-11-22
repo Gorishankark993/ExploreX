@@ -17,6 +17,7 @@ function StudentDashboard() {
   const [submittingReviewId, setSubmittingReviewId] = useState(null);
   const [deletingReviewId, setDeletingReviewId] = useState(null);
   const [selectedQR, setSelectedQR] = useState(null);
+  const [cancelConfirmationEventId, setCancelConfirmationEventId] = useState(null);
 
   // Fetch registrations and reviews
   const fetchMyEvents = async () => {
@@ -157,12 +158,6 @@ function StudentDashboard() {
 
   // Cancel event registration
   const handleCancelRegistration = async (eventId) => {
-    const confirmed = window.confirm(
-      "Are you sure you want to cancel this event registration?"
-    );
-
-    if (!confirmed) return;
-
     try {
       setCancellingId(eventId);
       setError("");
@@ -177,6 +172,7 @@ function StudentDashboard() {
       );
 
       setSelectedQR(null);
+      setCancelConfirmationEventId(null);
       setSuccess(
         response.data.message || "Registration cancelled successfully."
       );
@@ -422,7 +418,7 @@ function StudentDashboard() {
                   {/* CANCEL REGISTRATION */}
                   {!attended && (
                     <button
-                      onClick={() => handleCancelRegistration(event._id)}
+                      onClick={() => setCancelConfirmationEventId(event._id)}
                       disabled={cancellingId === event._id}
                       className="mt-5 w-full rounded-lg border border-red-500/30 py-3 font-semibold text-red-400 transition hover:bg-red-500/10 disabled:cursor-not-allowed disabled:opacity-50"
                     >
@@ -544,6 +540,63 @@ function StudentDashboard() {
           </div>
         )}
       </main>
+
+      {/* CUSTOM CANCEL REGISTRATION MODAL */}
+      {cancelConfirmationEventId && (
+        <div
+          className="fixed inset-0 z-50 flex items-center justify-center bg-black/70 px-4 py-6 backdrop-blur-sm"
+          onMouseDown={(e) => {
+            if (e.target === e.currentTarget && cancellingId !== cancelConfirmationEventId) {
+              setCancelConfirmationEventId(null);
+            }
+          }}
+        >
+          <div
+            role="dialog"
+            aria-modal="true"
+            aria-labelledby="cancel-registration-title"
+            className="w-full max-w-md rounded-2xl border border-violet-400/20 bg-[#1d1930] p-6 shadow-2xl shadow-black/40"
+          >
+            <div className="mb-5 flex h-12 w-12 items-center justify-center rounded-xl border border-red-400/20 bg-red-500/10 text-2xl text-red-400">
+              !
+            </div>
+
+            <h3 id="cancel-registration-title" className="text-xl font-bold text-white">
+              Cancel Registration?
+            </h3>
+
+            <p className="mt-3 text-sm leading-6 text-slate-300">
+              Are you sure you want to cancel your registration for{" "}
+              <span className="font-semibold text-violet-300">
+                {registrations.find(
+                  (item) => item.event?._id === cancelConfirmationEventId
+                )?.event?.title || "this event"}
+              </span>
+              ? You may need to register again if you change your mind.
+            </p>
+
+            <div className="mt-7 flex flex-col-reverse gap-3 sm:flex-row sm:justify-end">
+              <button
+                type="button"
+                onClick={() => setCancelConfirmationEventId(null)}
+                disabled={cancellingId === cancelConfirmationEventId}
+                className="rounded-lg border border-white/10 px-5 py-3 text-sm font-semibold text-slate-300 transition hover:bg-white/[0.06] disabled:cursor-not-allowed disabled:opacity-50"
+              >
+                Keep Registration
+              </button>
+
+              <button
+                type="button"
+                onClick={() => handleCancelRegistration(cancelConfirmationEventId)}
+                disabled={cancellingId === cancelConfirmationEventId}
+                className="rounded-lg bg-red-600 px-5 py-3 text-sm font-semibold text-white transition hover:bg-red-500 disabled:cursor-not-allowed disabled:opacity-50"
+              >
+                {cancellingId === cancelConfirmationEventId ? "Cancelling..." : "Yes, Cancel"}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }
