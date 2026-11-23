@@ -8,8 +8,9 @@ function Events() {
   const [category, setCategory] = useState("All");
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
-  const [message, setMessage] = useState("");
+  const [toast, setToast] = useState("");
   const [registering, setRegistering] = useState(null);
+  const [registeredEvents, setRegisteredEvents] = useState(() => new Set());
 
   const token = localStorage.getItem("token");
   const user = JSON.parse(localStorage.getItem("user") || "null");
@@ -37,6 +38,12 @@ function Events() {
     fetchEvents();
   }, []);
 
+  const showToast = (text) => {
+    setToast(text);
+    window.clearTimeout(showToast.timeout);
+    showToast.timeout = window.setTimeout(() => setToast(""), 3500);
+  };
+
   const handleRegister = async (eventId) => {
     if (!token || !user) {
       window.location.href = "/login";
@@ -44,20 +51,31 @@ function Events() {
     }
 
     if (user.role !== "student") {
-      setMessage("Only participant accounts can register for events.");
+      showToast("Only student accounts can register for events.");
       return;
     }
 
+    if (registeredEvents.has(eventId)) return;
+
     try {
       setRegistering(eventId);
-      setMessage("");
-
       await API.post(`/registrations/${eventId}`);
-      setMessage("Successfully registered for this event!");
+
+      setRegisteredEvents((previous) => new Set([...previous, eventId]));
+      showToast("Registration successful! You're on the list.");
     } catch (err) {
-      setMessage(
-        err.response?.data?.message || "Unable to register for this event."
-      );
+      const errorMessage =
+        err.response?.data?.message || "Unable to register for this event.";
+
+      if (
+        err.response?.status === 409 ||
+        errorMessage.toLowerCase().includes("already registered")
+      ) {
+        setRegisteredEvents((previous) => new Set([...previous, eventId]));
+        showToast("You're already registered for this event.");
+      } else {
+        showToast(errorMessage);
+      }
     } finally {
       setRegistering(null);
     }
@@ -84,6 +102,24 @@ function Events() {
 
   return (
     <div className="min-h-screen bg-[#100d1c] text-white">
+      {toast && (
+        <div
+          role="status"
+          aria-live="polite"
+          className="fixed right-5 top-5 z-[100] flex max-w-sm items-start gap-3 rounded-xl border border-emerald-400/25 bg-[#17251f] px-5 py-4 text-sm text-emerald-200 shadow-2xl shadow-black/40"
+        >
+          <span className="text-lg" aria-hidden="true">✓</span>
+          <span className="flex-1 leading-6">{toast}</span>
+          <button
+            type="button"
+            onClick={() => setToast("")}
+            aria-label="Dismiss notification"
+            className="ml-2 text-emerald-200/70 transition hover:text-white"
+          >
+            ×
+          </button>
+        </div>
+      )}
       {/* NAVBAR */}
       <nav className="sticky top-0 z-30 border-b border-white/[0.07] bg-[#100d1c]/90 backdrop-blur-xl">
         <div className="mx-auto flex max-w-7xl items-center justify-between px-5 py-4 sm:px-8 lg:px-10">
@@ -194,16 +230,6 @@ function Events() {
             ))}
           </div>
         </section>
-
-        {/* STATUS MESSAGE */}
-        {message && (
-          <div
-            role="status"
-            className="mt-6 rounded-xl border border-violet-400/20 bg-violet-500/[0.08] px-5 py-4 text-sm text-violet-200"
-          >
-            {message}
-          </div>
-        )}
 
         {/* EVENTS */}
         <section className="mt-12 sm:mt-14">
@@ -327,12 +353,27 @@ function Events() {
 
                       <button
                         onClick={() => handleRegister(event._id)}
-                        disabled={registering === event._id}
-                        className="mt-3 w-full rounded-xl bg-violet-600 px-4 py-3 text-sm font-semibold text-white shadow-lg shadow-violet-950/20 transition duration-200 hover:bg-violet-500 disabled:cursor-not-allowed disabled:opacity-60"
+                        disabled={
+                          registering === event._id ||
+                          registeredEvents.has(event._id)
+                        }
+                        aria-live="polite"
+                        className={`mt-3 flex w-full items-center justify-center gap-2 rounded-xl px-4 py-3 text-sm font-semibold text-white shadow-lg transition duration-200 disabled:cursor-not-allowed ${
+                          registeredEvents.has(event._id)
+                            ? "border border-emerald-400/30 bg-emerald-500/15 text-emerald-300 shadow-none"
+                            : "bg-violet-600 shadow-violet-950/20 hover:bg-violet-500 disabled:opacity-60"
+                        }`}
                       >
-                        {registering === event._id
-                          ? "Registering..."
-                          : "Register for event"}
+                        {registering === event._id ? (
+                          <>
+                            <span className="h-4 w-4 animate-spin rounded-full border-2 border-white/30 border-t-white" />
+                            Registering...
+                          </>
+                        ) : registeredEvents.has(event._id) ? (
+                          <>✓ Registered</>
+                        ) : (
+                          "Register for event"
+                        )}
                       </button>
                     </div>
                   </div>
