@@ -9,24 +9,36 @@ const router = express.Router();
 // REGISTER API
 router.post("/register", async (req, res) => {
   try {
-    const { name, email, password } = req.body;
+    const { name, email, password, role } = req.body;
 
     // Validate required fields
-    if (!name || !email || !password) {
+    if (!name || !email || !password || !role) {
       return res.status(400).json({
         message: "Please fill all required fields",
       });
     }
 
+    // Validate role
+    const allowedRoles = ["student", "organizer"];
+
+    if (!allowedRoles.includes(role)) {
+      return res.status(400).json({
+        message: "Invalid role selected",
+      });
+    }
+
+    // Validate password
     if (password.length < 6) {
       return res.status(400).json({
         message: "Password must be at least 6 characters",
       });
     }
 
+    const normalizedEmail = email.trim().toLowerCase();
+
     // Check existing user
     const existingUser = await User.findOne({
-      email: email.toLowerCase(),
+      email: normalizedEmail,
     });
 
     if (existingUser) {
@@ -38,12 +50,12 @@ router.post("/register", async (req, res) => {
     // Hash password
     const hashedPassword = await bcrypt.hash(password, 10);
 
-    // Create student account
+    // Create account with selected role
     const user = await User.create({
-      name,
-      email,
+      name: name.trim(),
+      email: normalizedEmail,
       password: hashedPassword,
-      role: "student",
+      role: role,
     });
 
     // Generate JWT
@@ -89,7 +101,7 @@ router.post("/login", async (req, res) => {
 
     // Find user
     const user = await User.findOne({
-      email: email.toLowerCase(),
+      email: email.trim().toLowerCase(),
     });
 
     if (!user) {
