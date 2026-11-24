@@ -1051,39 +1051,6 @@ function AdminDashboard() {
 
         )}
 
-        {/* HELP & SUPPORT */}
-        <section className="mt-10 overflow-hidden rounded-2xl border border-violet-400/20 bg-gradient-to-br from-[#241b3a] via-[#1b1630] to-[#151126] p-6 sm:p-8">
-          <div className="flex flex-col gap-6 sm:flex-row sm:items-center sm:justify-between">
-            <div className="max-w-2xl">
-              <div className="mb-3 inline-flex items-center gap-2 rounded-full border border-violet-400/20 bg-violet-500/10 px-3 py-1 text-xs font-semibold uppercase tracking-wider text-violet-300">
-                <span aria-hidden="true">✦</span>
-                Help & Support
-              </div>
-              <h3 className="text-xl font-bold text-white sm:text-2xl">
-                Need help or have a query?
-              </h3>
-              <p className="mt-2 text-sm leading-6 text-slate-300">
-                If you experience an issue or have a question about ExploreX,
-                get in touch with the project support team. We’ll be happy to help.
-              </p>
-              <a
-                href="mailto:gorishankark993@gmail.com"
-                className="mt-3 inline-block text-sm font-medium text-violet-300 transition hover:text-violet-200"
-              >
-                gorishankark993@gmail.com
-              </a>
-            </div>
-
-            <a
-              href="mailto:gorishankark993@gmail.com?subject=ExploreX%20-%20Support%20Request"
-              className="inline-flex shrink-0 items-center justify-center gap-2 rounded-xl bg-violet-600 px-6 py-3 text-sm font-semibold text-white shadow-lg shadow-violet-950/30 transition hover:-translate-y-0.5 hover:bg-violet-500 focus:outline-none focus:ring-4 focus:ring-violet-500/30"
-            >
-              Contact Support
-              <span aria-hidden="true">↗</span>
-            </a>
-          </div>
-        </section>
-
         {/* FOOTER */}
         <div className="mt-12 border-t border-white/10 py-6 text-center text-sm text-gray-500">
           © {new Date().getFullYear()} ExploreX. Administration Panel.

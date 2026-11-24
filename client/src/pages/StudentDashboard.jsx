@@ -540,6 +540,41 @@ function StudentDashboard() {
             </div>
           )}
         </section>
+
+        {/* HELP & SUPPORT */}
+        <section className="mt-10 overflow-hidden rounded-3xl border border-violet-400/20 bg-gradient-to-br from-[#241b3b] via-[#1c1730] to-[#151126] p-6 sm:p-8">
+          <div className="flex flex-col gap-6 sm:flex-row sm:items-center sm:justify-between">
+            <div className="max-w-3xl">
+              <span className="inline-flex items-center gap-2 rounded-full border border-violet-400/25 bg-violet-500/10 px-3 py-1.5 text-xs font-bold uppercase tracking-wider text-violet-300">
+                ✦ Help &amp; Support
+              </span>
+              <h2 className="mt-4 text-xl font-bold text-white sm:text-2xl">
+                Need help or have a query?
+              </h2>
+              <p className="mt-2 text-sm leading-6 text-slate-300">
+                If you experience an issue or have a question about ExploreX,
+                contact the project support team. We’ll be happy to help.
+              </p>
+              <a
+                href="https://mail.google.com/mail/?view=cm&fs=1&to=gorishankark993@gmail.com&su=ExploreX%20-%20Support%20Request"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="mt-4 inline-block text-sm font-semibold text-violet-300 transition hover:text-violet-200 hover:underline"
+              >
+                gorishankark993@gmail.com
+              </a>
+            </div>
+            <a
+              href="https://mail.google.com/mail/?view=cm&fs=1&to=gorishankark993@gmail.com&su=ExploreX%20-%20Support%20Request&body=Hello%20ExploreX%20Support%2C%0A%0AI%20need%20help%20with%3A%20"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="inline-flex shrink-0 items-center justify-center gap-2 rounded-xl bg-violet-600 px-6 py-4 text-sm font-bold text-white shadow-lg shadow-violet-950/30 transition hover:-translate-y-0.5 hover:bg-violet-500"
+            >
+              Contact Support <span aria-hidden="true">↗</span>
+            </a>
+          </div>
+        </section>
+
       </main>
 
       {cancelTarget && (
